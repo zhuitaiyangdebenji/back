@@ -1,5 +1,6 @@
 package com.neuedu.util;
 
+import com.thoughtworks.xstream.core.util.Base64Encoder;
 import sun.misc.BASE64Encoder;
 
 import javax.crypto.*;
@@ -12,15 +13,15 @@ import java.security.SecureRandom;
  * Created by zhao on 2019/4/1.
  */
 public class DESUTIL {
+    //图纸
     static Key key;
+    //算法因子
     static  String KEYSTR="wy";
     static {
-
         try {
-            //key的生成器 des是一个算法,只能写des
+            //key的生成器
             KeyGenerator keyGenerator=KeyGenerator.getInstance("DES");
             SecureRandom secureRandom=SecureRandom.getInstance("SHA1PRNG");
-            //设置算法因子
             secureRandom.setSeed(KEYSTR.getBytes());
             //初始化key,通过给定的算法因子初始化
             keyGenerator.init(secureRandom);
@@ -52,8 +53,29 @@ public class DESUTIL {
         }
         return  result;
     }
-
+    public  static  String decode(String str){
+        String result="";
+        Base64Encoder base64Encoder=new Base64Encoder();
+        byte[] b=base64Encoder.decode(str);
+        try {
+            Cipher cipher=Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE,key);
+            byte[] pwd=cipher.doFinal(b);
+            result=new String(pwd);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return  result;
+    }
     public static void main(String[] args) {
-        System.out.println(encode("123456"));
+        System.out.println(decode("k6kNZBRUISk="));
     }
 }
